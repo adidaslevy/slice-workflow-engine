@@ -6,6 +6,7 @@ export enum StepStatus {
   RUNNING = 'RUNNING',
   SUCCESS = 'SUCCESS',
   FAILED = 'FAILED',
+  SKIPPED = 'SKIPPED'
 }
 
 export class Workflow {

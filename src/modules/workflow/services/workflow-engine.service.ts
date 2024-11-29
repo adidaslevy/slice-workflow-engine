@@ -13,9 +13,9 @@ export class WorkflowEngineService {
             return new Step(
                 dto.id,
                 dto.type,
-                async () => {
+                dto.logic? dto.logic : async () => {
                     console.log(`Executing step: ${dto.id} of type ${dto.type.kind}`);
-                }, // the logic
+                } , // the logic
                 dto.dependencies || [],
             );
         });
@@ -37,8 +37,15 @@ export class WorkflowEngineService {
             }
 
             for (const dependencyId of step.dependencies) {
+                
                 while (!completedSteps.has(dependencyId)) {
-                    await new Promise(resolve => setTimeout(resolve, 10000));
+                    const dependency = workflow.steps.get(dependencyId);
+                    if (dependency && dependency.status === StepStatus.FAILED) {
+                        console.log(`Skipping step ${step.id} because dependency ${dependencyId} failed.`);
+                        step.status = StepStatus.SKIPPED; // Optional status to indicate skipping
+                        return;
+                    }
+                    await new Promise(resolve => setTimeout(resolve, 1000));
                 }
             }
             step.status = StepStatus.RUNNING;
